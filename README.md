@@ -35,7 +35,3 @@ To run unit tests:
 ```sh
 npm test
 ```
-
-## Credits
-
-Made with [createapp.dev](https://createapp.dev/)
