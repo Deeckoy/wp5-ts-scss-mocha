@@ -5,9 +5,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const config = {
 	entry: './src/index.ts',
+	mode: 'development',
+	devtool: 'source-map',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		filename: '[name].[contenthash].js',
@@ -55,7 +58,11 @@ const config = {
 	},
 	plugins: [
 		new CopyPlugin({
-			patterns: [{ from: 'src/index.html' }],
+			patterns: [{ from: './src/template.html' }, { from: './src/assets', to: './dist/assets' }],
+		}),
+		new ESLintPlugin({
+			extensions: ['.tsx', '.ts', '.js'],
+			exclude: '/node_modules/',
 		}),
 		new HtmlWebpackPlugin({
 			// templateContent: ({ htmlWebpackPlugin }) => '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>' + htmlWebpackPlugin.options.title + '</title></head><body><div id=\"app\"></div></body></html>',
@@ -67,7 +74,12 @@ const config = {
 			analyzerMode: 'static',
 			openAnalyzer: false,
 		}),
-		new MiniCssExtractPlugin(),
+		new MiniCssExtractPlugin({
+			// Options similar to the same options in webpackOptions.output
+			// both options are optional
+			filename: '[name].[contenthash].css',
+			chunkFilename: '[id].css',
+		}),
 		new CleanWebpackPlugin(),
 	],
 	resolve: {
@@ -75,6 +87,7 @@ const config = {
 	},
 	optimization: {
 		runtimeChunk: 'single',
+		usedExports: true,
 		splitChunks: {
 			cacheGroups: {
 				vendor: {
